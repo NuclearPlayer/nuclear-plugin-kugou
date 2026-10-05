@@ -1,0 +1,31 @@
+{
+  "name": "nuclear-plugin-kugou",
+  "version": "0.1.0",
+  "description": "Kugou lyrics provider for Nuclear",
+  "author": "nukeop",
+  "license": "AGPL-3.0-only",
+  "main": "src/index.ts",
+  "type": "module",
+  "nuclear": {
+    "displayName": "Kugou",
+    "categories": [
+      "lyrics"
+    ],
+    "icon": {
+      "type": "link",
+      "link": "https://www.kugou.com/favicon.ico"
+    },
+    "permissions": []
+  },
+  "scripts": {
+    "test": "vitest --run",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nuclearplayer/plugin-sdk": "^2.9.0"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.2"
+  }
+}
