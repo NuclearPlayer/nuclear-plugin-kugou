@@ -13,7 +13,7 @@
     ],
     "icon": {
       "type": "link",
-      "link": "https://www.kugou.com/favicon.ico"
+      "link": "https://raw.githubusercontent.com/NuclearPlayer/nuclear-plugin-kugou/master/assets/icon.png"
     },
     "permissions": []
   },
