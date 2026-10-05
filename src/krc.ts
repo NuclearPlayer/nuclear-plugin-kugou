@@ -62,13 +62,32 @@ const withAnnotations = (
 const hasText = ({ segments }: KrcLine): boolean =>
   segments.some(({ text }) => text.trim().length > 0);
 
+const lineText = ({ segments }: KrcLine): string =>
+  segments.map(({ text }) => text).join('');
+
+const isCredit = (line: KrcLine, index: number): boolean => {
+  const text = lineText(line);
+  const isTitle = index === 0 && text.includes(' - ');
+  return isTitle || text.includes('：');
+};
+
+const dropLeadingCredits = (lines: KrcLine[]): KrcLine[] => {
+  const firstLyricIndex = lines.findIndex((line, index) => !isCredit(line, index));
+  if (firstLyricIndex === -1) {
+    return [];
+  }
+  return lines.slice(firstLyricIndex);
+};
+
 export const parseKrc = (krc: string): WordSyncedLyrics => {
   const rows = krc.split(/\r?\n/);
   const annotations = findAnnotations(rows);
-  const lines = rows
-    .flatMap(parseLine)
-    .map((line, index) => withAnnotations(line, annotations[index]))
-    .filter(hasText);
+  const lines = dropLeadingCredits(
+    rows
+      .flatMap(parseLine)
+      .map((line, index) => withAnnotations(line, annotations[index]))
+      .filter(hasText),
+  );
 
   return { type: 'wordSynced', metadata: {}, sections: [{ lines }] };
 };

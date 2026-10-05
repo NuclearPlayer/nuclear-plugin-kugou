@@ -118,6 +118,67 @@ describe('parseKrc', () => {
     });
   });
 
+  it('drops the title line and the credit lines before the first lyric line', () => {
+    const krc = [
+      '[0,490]<0,490,0>夜に駆ける - YOASOBI',
+      '[491,112]<0,112,0>词：Ayase',
+      '[604,188]<0,188,0>Written by：Daryl Hall/John Oates',
+      '[1057,5065]<0,5065,0>沈むように',
+    ].join('\n');
+
+    expect(parseKrc(krc)).toEqual({
+      type: 'wordSynced',
+      metadata: {},
+      sections: [
+        {
+          lines: [
+            {
+              startMs: 1057,
+              endMs: 6122,
+              segments: [{ text: '沈むように', startMs: 1057, endMs: 6122 }],
+            },
+          ],
+        },
+      ],
+    });
+  });
+
+  it('keeps lines with a dash or a colon after the first lyric line', () => {
+    const krc = [
+      '[1000,1000]<0,1000,0>Reckoner',
+      '[2000,1000]<0,1000,0>Take it with you - Radiohead',
+      '[3000,1000]<0,1000,0>他说：再见',
+    ].join('\n');
+
+    expect(parseKrc(krc)).toEqual({
+      type: 'wordSynced',
+      metadata: {},
+      sections: [
+        {
+          lines: [
+            {
+              startMs: 1000,
+              endMs: 2000,
+              segments: [{ text: 'Reckoner', startMs: 1000, endMs: 2000 }],
+            },
+            {
+              startMs: 2000,
+              endMs: 3000,
+              segments: [
+                { text: 'Take it with you - Radiohead', startMs: 2000, endMs: 3000 },
+              ],
+            },
+            {
+              startMs: 3000,
+              endMs: 4000,
+              segments: [{ text: '他说：再见', startMs: 3000, endMs: 4000 }],
+            },
+          ],
+        },
+      ],
+    });
+  });
+
   it('adds translations and romanizations from the language tag to the lyric line at the same index', () => {
     const krc = [
       '[ti:夜に駆ける]',
@@ -194,25 +255,8 @@ describe('parseKrc', () => {
   });
 
   it('parses a decoded Kugou KRC file', () => {
-    const [titleLine, , , firstLyricLine, , , sayonaraLine] =
-      parseKrc(yoruNiKakeruKrc).sections[0].lines;
+    const [firstLyricLine, , , sayonaraLine] = parseKrc(yoruNiKakeruKrc).sections[0].lines;
 
-    expect(titleLine).toEqual({
-      startMs: 64,
-      endMs: 704,
-      segments: [
-        { text: 'YOASOBI ', startMs: 64, endMs: 549 },
-        { text: '- ', startMs: 549, endMs: 549 },
-        { text: '夜', startMs: 549, endMs: 602 },
-        { text: 'に', startMs: 602, endMs: 602 },
-        { text: '駆', startMs: 602, endMs: 653 },
-        { text: 'け', startMs: 653, endMs: 704 },
-        { text: 'る', startMs: 704, endMs: 704 },
-      ],
-      annotations: [
-        { type: 'romanization', language: 'und-Latn', text: 'YOASOBI - yo ru ni ka ke ru' },
-      ],
-    });
     expect(firstLyricLine).toEqual({
       startMs: 1671,
       endMs: 3438,
