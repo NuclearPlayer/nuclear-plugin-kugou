@@ -1,7 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { parseKrc } from './krc';
 import yoruNiKakeruKrc from './test/fixtures/yoru-ni-kakeru.krc?raw';
+
+vi.stubGlobal(
+  'DOMParser',
+  class {
+    parseFromString(text: string) {
+      return { documentElement: { textContent: text } };
+    }
+  },
+);
 
 type LanguageContent = {
   type: number;
