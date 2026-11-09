@@ -5,6 +5,7 @@ import type {
   WordSyncedLyrics,
 } from '@nuclearplayer/plugin-sdk';
 
+import { decodeHtmlEntities } from './html-entities';
 import { parseLanguageTag } from './language-tag';
 
 type KrcLine = SyncedLyricsLine<TimedLyricsSegment>;
@@ -13,7 +14,7 @@ type KrcLine = SyncedLyricsLine<TimedLyricsSegment>;
 const parseWords = (body: string, lineStartMs: number): TimedLyricsSegment[] =>
   [...body.matchAll(/<(\d+),(\d+),\d+>([^<]*)/g)].map(([, offsetMs, durationMs, text]) => {
     const startMs = lineStartMs + Number(offsetMs);
-    return { text, startMs, endMs: startMs + Number(durationMs) };
+    return { text: decodeHtmlEntities(text), startMs, endMs: startMs + Number(durationMs) };
   });
 
 const parseSegments = (
@@ -23,7 +24,7 @@ const parseSegments = (
 ): TimedLyricsSegment[] => {
   const words = parseWords(body, startMs);
   if (words.length === 0) {
-    return [{ text: body, startMs, endMs }];
+    return [{ text: decodeHtmlEntities(body), startMs, endMs }];
   }
   return words;
 };

@@ -1,6 +1,7 @@
 import type { LineAnnotation } from '@nuclearplayer/plugin-sdk';
 
 import { base64ToBytes } from './base64';
+import { decodeHtmlEntities } from './html-entities';
 
 type KugouLanguageContent = {
   type: number;
@@ -25,7 +26,7 @@ const annotationAt =
   (lineIndex: number) =>
   ({ type, lyricContent }: KugouLanguageContent): LineAnnotation[] => {
     const kind = ANNOTATION_KINDS[type];
-    const text = (lyricContent[lineIndex] ?? []).join('').trim();
+    const text = decodeHtmlEntities((lyricContent[lineIndex] ?? []).join('').trim());
     if (!kind || text.length === 0) {
       return [];
     }
